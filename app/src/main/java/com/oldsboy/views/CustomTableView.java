@@ -194,68 +194,64 @@ public class CustomTableView<T> extends LinearLayout {
         OnClickListener onClickListener = new OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()){
-                    case R.id.btn_add:
-                        List<String[]> list = new ArrayList<>();
-                        for (int i = 0; i < tableHeadList.size(); i++) {
-                            String[] gezi = tableHeadList.get(i);
-                            list.add(new String[]{CustomTableRecyclerAdapter.sufferString, gezi[1], gezi[2]});
-                        }
-                        table_list.add(list);
-                        customTableRecyclerAdapter.notifyItemInserted(table_list.size());
+                int id = v.getId();
+                if (id == R.id.btn_add) {
+                    List<String[]> list = new ArrayList<>();
+                    for (int i = 0; i < tableHeadList.size(); i++) {
+                        String[] gezi = tableHeadList.get(i);
+                        list.add(new String[]{CustomTableRecyclerAdapter.sufferString, gezi[1], gezi[2]});
+                    }
+                    table_list.add(list);
+                    customTableRecyclerAdapter.notifyItemInserted(table_list.size());
 
 //                            onToolBarClick.clickAdd();
-                        break;
-                    case R.id.btn_edit:
-                        if (customTableRecyclerAdapter.getLast_click_item() != -1) {
-                            //  获取那条item数据重新设置，刷新表格
-                            if (customTableRecyclerAdapter.getItemViewType(customTableRecyclerAdapter.getLast_click_item()) == CustomTableRecyclerAdapter.SHOW_TYPE) {
-                                List<String[]> line = (List<String[]>) customTableRecyclerAdapter.getItem(customTableRecyclerAdapter.getLast_click_item());
-                                for (int i = 0; i < line.size(); i++) {
-                                    line.get(i)[0] = CustomTableRecyclerAdapter.sufferString + line.get(i)[0];
-                                }
-                                customTableRecyclerAdapter.notifyItemChanged(customTableRecyclerAdapter.getLast_click_item(), line);
-                            }else {
-                                Log.e(TAG, "不可重复编辑单条item");
+                } else if (id == R.id.btn_edit) {
+                    if (customTableRecyclerAdapter.getLast_click_item() != -1) {
+                        //  获取那条item数据重新设置，刷新表格
+                        if (customTableRecyclerAdapter.getItemViewType(customTableRecyclerAdapter.getLast_click_item()) == CustomTableRecyclerAdapter.SHOW_TYPE) {
+                            List<String[]> line = (List<String[]>) customTableRecyclerAdapter.getItem(customTableRecyclerAdapter.getLast_click_item());
+                            for (int i = 0; i < line.size(); i++) {
+                                line.get(i)[0] = CustomTableRecyclerAdapter.sufferString + line.get(i)[0];
                             }
+                            customTableRecyclerAdapter.notifyItemChanged(customTableRecyclerAdapter.getLast_click_item(), line);
+                        } else {
+                            Log.e(TAG, "不可重复编辑单条item");
+                        }
 //                                onToolBarClick.clickEdit();
-                        }else {
-                            Toast.makeText(context, "请选择一条item进行编辑!", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                    case R.id.btn_delete:
-                        if (customTableRecyclerAdapter.getLast_click_item() != -1) {
+                    } else {
+                        Toast.makeText(context, "请选择一条item进行编辑!", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (id == R.id.btn_delete) {
+                    if (customTableRecyclerAdapter.getLast_click_item() != -1) {
 //                                获取那条item数据重新设置，刷新表格
-                            String serverId = customTableRecyclerAdapter.getItem(customTableRecyclerAdapter.getLast_click_item()).get(0)[0].replaceFirst(CustomTableRecyclerAdapter.sufferString, "");
-                            customTableRecyclerAdapter.removeItem(customTableRecyclerAdapter.getLast_click_item());
-                            if (onToolBarClick.clickDelete(serverId)){
-                                Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
-                                customTableRecyclerAdapter.setLast_click_item(-1);
-                            }else {
-                                Toast.makeText(context, "删除失败", Toast.LENGTH_SHORT).show();
-                                Log.e(TAG, "删除失败！serverId是：" + serverId);
-                            }
-                        }else {
-                            Toast.makeText(context, "请选择一条item进行删除!", Toast.LENGTH_SHORT).show();
+                        String serverId = customTableRecyclerAdapter.getItem(customTableRecyclerAdapter.getLast_click_item()).get(0)[0].replaceFirst(CustomTableRecyclerAdapter.sufferString, "");
+                        customTableRecyclerAdapter.removeItem(customTableRecyclerAdapter.getLast_click_item());
+                        if (onToolBarClick.clickDelete(serverId)) {
+                            Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
+                            customTableRecyclerAdapter.setLast_click_item(-1);
+                        } else {
+                            Toast.makeText(context, "删除失败", Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "删除失败！serverId是：" + serverId);
                         }
-                        break;
-                    case R.id.btn_save:
-                        customTableRecyclerAdapter.setLast_click_item(-1);
-                        List<ChangeBean> changeData = customTableRecyclerAdapter.getChangeData();
-                        onToolBarClick.clickSave(changeData);
+                    } else {
+                        Toast.makeText(context, "请选择一条item进行删除!", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (id == R.id.btn_save) {
+                    customTableRecyclerAdapter.setLast_click_item(-1);
+                    List<ChangeBean> changeData = customTableRecyclerAdapter.getChangeData();
+                    onToolBarClick.clickSave(changeData);
 
-                        for (ChangeBean changeDatum : changeData) {
-                            int position = changeDatum.getPosition();
-                            table_list.clear();
-                            List<T> newData = dataSetting.getDataList();
-                            table_list.addAll(getTableList(newData));
-                            customTableRecyclerAdapter.notifyItemChanged(position);
-                        }
+                    for (ChangeBean changeDatum : changeData) {
+                        int position = changeDatum.getPosition();
+                        table_list.clear();
+                        List<T> newData = dataSetting.getDataList();
+                        table_list.addAll(getTableList(newData));
+                        customTableRecyclerAdapter.notifyItemChanged(position);
+                    }
 //                        table_list.clear();
 //                        table_list.addAll(getTableList(dataSetting.getDataList()));
 //                        customTableRecyclerAdapter.notifyDataSetChanged();
 //                        initRecyclerView();
-                        break;
                 }
             }
         };
