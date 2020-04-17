@@ -30,7 +30,7 @@ import static com.oldsboy.views.utils.StringUtil.isEmpty;
  * @UpdateRemark: 更新说明：
  * @Version: 1.0
  */
-public class CustomTableView<T> extends LinearLayout {
+public class TableView<T> extends LinearLayout {
     public static final String TAG = "customTableView";
     private Context context;
 
@@ -57,10 +57,10 @@ public class CustomTableView<T> extends LinearLayout {
     /**
      * interface
      * **/
-    private CustomTableView.onToolBarClick onToolBarClick;
-    private CustomTableView.dataSetting<T> dataSetting;
+    private TableView.onToolBarClick onToolBarClick;
+    private TableView.dataSetting<T> dataSetting;
 
-    public CustomTableRecyclerAdapter customTableRecyclerAdapter;
+    public TableRecyclerAdapter tableRecyclerAdapter;
 
     public void setScrollListView(boolean canScroll){
         if (canScroll){
@@ -85,11 +85,11 @@ public class CustomTableView<T> extends LinearLayout {
         this.hideId = hideId;
     }
 
-    public void setOnToolBarClick(CustomTableView.onToolBarClick onToolBarClick) {
+    public void setOnToolBarClick(TableView.onToolBarClick onToolBarClick) {
         this.onToolBarClick = onToolBarClick;
     }
 
-    public void setDataSetting(CustomTableView.dataSetting<T> dataSetting) {
+    public void setDataSetting(TableView.dataSetting<T> dataSetting) {
         this.dataSetting = dataSetting;
     }
 
@@ -111,7 +111,7 @@ public class CustomTableView<T> extends LinearLayout {
      * @param onToolBarClick            工具栏配置
      * @param dataSetting               数据源配置
      */
-    public CustomTableView(Context context, String table_name, List<String[]> tableHeadList, onToolBarClick onToolBarClick, dataSetting<T> dataSetting, OnBtnClickListener onBtnClickListener) {
+    public TableView(Context context, String table_name, List<String[]> tableHeadList, onToolBarClick onToolBarClick, dataSetting<T> dataSetting, OnBtnClickListener onBtnClickListener) {
         super(context);
         this.context = context;
         this.table_name = table_name;
@@ -151,9 +151,9 @@ public class CustomTableView<T> extends LinearLayout {
                 cellWidthPer.add(String.valueOf(width));        //  收集每列的列宽
 
                 if(i == 0){     //  第一列的id都隐藏
-                    CustomTableRecyclerAdapter.addTextViewToLayout(context, width, value, container_tablehead, hideId);
+                    TableRecyclerAdapter.addTextViewToLayout(context, width, value, container_tablehead, hideId);
                 }else {
-                    CustomTableRecyclerAdapter.addTextViewToLayout(context, width, value, container_tablehead, false);
+                    TableRecyclerAdapter.addTextViewToLayout(context, width, value, container_tablehead, false);
                 }
             }catch (IndexOutOfBoundsException e){
                 e.printStackTrace();
@@ -179,13 +179,13 @@ public class CustomTableView<T> extends LinearLayout {
                 }
             };
         }
-        customTableRecyclerAdapter = new CustomTableRecyclerAdapter(context, tableHeadList, table_list, hideId, recycler_tablebody, picture_base_path);
+        tableRecyclerAdapter = new TableRecyclerAdapter(context, tableHeadList, table_list, hideId, recycler_tablebody, picture_base_path);
         if (onBtnClickListener != null) {
-            customTableRecyclerAdapter.setOnSpinnerClickListener(onBtnClickListener.onSpinnerClickListener());
-            customTableRecyclerAdapter.setOnImageViewClickListener(onBtnClickListener.onImageViewClickListener());
+            tableRecyclerAdapter.setOnSpinnerClickListener(onBtnClickListener.onSpinnerClickListener());
+            tableRecyclerAdapter.setOnImageViewClickListener(onBtnClickListener.onImageViewClickListener());
         }
         recycler_tablebody.setLayoutManager(linearLayoutManager);
-        recycler_tablebody.setAdapter(customTableRecyclerAdapter);
+        recycler_tablebody.setAdapter(tableRecyclerAdapter);
     }
 
     private void initTableNameAndToolBar() {
@@ -199,21 +199,21 @@ public class CustomTableView<T> extends LinearLayout {
                     List<String[]> list = new ArrayList<>();
                     for (int i = 0; i < tableHeadList.size(); i++) {
                         String[] gezi = tableHeadList.get(i);
-                        list.add(new String[]{CustomTableRecyclerAdapter.sufferString, gezi[1], gezi[2]});
+                        list.add(new String[]{TableRecyclerAdapter.sufferString, gezi[1], gezi[2]});
                     }
                     table_list.add(list);
-                    customTableRecyclerAdapter.notifyItemInserted(table_list.size());
+                    tableRecyclerAdapter.notifyItemInserted(table_list.size());
 
 //                            onToolBarClick.clickAdd();
                 } else if (id == R.id.btn_edit) {
-                    if (customTableRecyclerAdapter.getLast_click_item() != -1) {
+                    if (tableRecyclerAdapter.getLast_click_item() != -1) {
                         //  获取那条item数据重新设置，刷新表格
-                        if (customTableRecyclerAdapter.getItemViewType(customTableRecyclerAdapter.getLast_click_item()) == CustomTableRecyclerAdapter.SHOW_TYPE) {
-                            List<String[]> line = (List<String[]>) customTableRecyclerAdapter.getItem(customTableRecyclerAdapter.getLast_click_item());
+                        if (tableRecyclerAdapter.getItemViewType(tableRecyclerAdapter.getLast_click_item()) == TableRecyclerAdapter.SHOW_TYPE) {
+                            List<String[]> line = (List<String[]>) tableRecyclerAdapter.getItem(tableRecyclerAdapter.getLast_click_item());
                             for (int i = 0; i < line.size(); i++) {
-                                line.get(i)[0] = CustomTableRecyclerAdapter.sufferString + line.get(i)[0];
+                                line.get(i)[0] = TableRecyclerAdapter.sufferString + line.get(i)[0];
                             }
-                            customTableRecyclerAdapter.notifyItemChanged(customTableRecyclerAdapter.getLast_click_item(), line);
+                            tableRecyclerAdapter.notifyItemChanged(tableRecyclerAdapter.getLast_click_item(), line);
                         } else {
                             Log.e(TAG, "不可重复编辑单条item");
                         }
@@ -222,13 +222,13 @@ public class CustomTableView<T> extends LinearLayout {
                         Toast.makeText(context, "请选择一条item进行编辑!", Toast.LENGTH_SHORT).show();
                     }
                 } else if (id == R.id.btn_delete) {
-                    if (customTableRecyclerAdapter.getLast_click_item() != -1) {
+                    if (tableRecyclerAdapter.getLast_click_item() != -1) {
 //                                获取那条item数据重新设置，刷新表格
-                        String serverId = customTableRecyclerAdapter.getItem(customTableRecyclerAdapter.getLast_click_item()).get(0)[0].replaceFirst(CustomTableRecyclerAdapter.sufferString, "");
-                        customTableRecyclerAdapter.removeItem(customTableRecyclerAdapter.getLast_click_item());
+                        String serverId = tableRecyclerAdapter.getItem(tableRecyclerAdapter.getLast_click_item()).get(0)[0].replaceFirst(TableRecyclerAdapter.sufferString, "");
+                        tableRecyclerAdapter.removeItem(tableRecyclerAdapter.getLast_click_item());
                         if (onToolBarClick.clickDelete(serverId)) {
                             Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
-                            customTableRecyclerAdapter.setLast_click_item(-1);
+                            tableRecyclerAdapter.setLast_click_item(-1);
                         } else {
                             Toast.makeText(context, "删除失败", Toast.LENGTH_SHORT).show();
                             Log.e(TAG, "删除失败！serverId是：" + serverId);
@@ -237,8 +237,8 @@ public class CustomTableView<T> extends LinearLayout {
                         Toast.makeText(context, "请选择一条item进行删除!", Toast.LENGTH_SHORT).show();
                     }
                 } else if (id == R.id.btn_save) {
-                    customTableRecyclerAdapter.setLast_click_item(-1);
-                    List<ChangeBean> changeData = customTableRecyclerAdapter.getChangeData();
+                    tableRecyclerAdapter.setLast_click_item(-1);
+                    List<ChangeBean> changeData = tableRecyclerAdapter.getChangeData();
                     onToolBarClick.clickSave(changeData);
 
                     for (ChangeBean changeDatum : changeData) {
@@ -246,11 +246,11 @@ public class CustomTableView<T> extends LinearLayout {
                         table_list.clear();
                         List<T> newData = dataSetting.getDataList();
                         table_list.addAll(getTableList(newData));
-                        customTableRecyclerAdapter.notifyItemChanged(position);
+                        tableRecyclerAdapter.notifyItemChanged(position);
                     }
 //                        table_list.clear();
 //                        table_list.addAll(getTableList(dataSetting.getDataList()));
-//                        customTableRecyclerAdapter.notifyDataSetChanged();
+//                        tableRecyclerAdapter.notifyDataSetChanged();
 //                        initRecyclerView();
                 }
             }
@@ -290,8 +290,8 @@ public class CustomTableView<T> extends LinearLayout {
     private OnBtnClickListener onBtnClickListener;
 
     public interface OnBtnClickListener {
-        CustomTableRecyclerAdapter.OnImageViewClickListener onImageViewClickListener();
-        CustomTableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener();
+        TableRecyclerAdapter.OnImageViewClickListener onImageViewClickListener();
+        TableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener();
     }
 
     public interface onToolBarClick{

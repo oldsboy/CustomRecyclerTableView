@@ -27,7 +27,7 @@ import static com.oldsboy.views.utils.StringUtil.isEmpty;
 /**
  * 通用Adapter,条纹属性、动态字段数、动态字段宽度
  */
-public class CustomTableRecyclerAdapter extends RecyclerView.Adapter<CustomTableRecyclerAdapter.ListViewHolder> {
+public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdapter.ListViewHolder> {
     public static final String TAG = "customTableAdapter";
     public static final int SHOW_TYPE = 0;
     public static final int EDIT_TYPE = 1;
@@ -52,7 +52,7 @@ public class CustomTableRecyclerAdapter extends RecyclerView.Adapter<CustomTable
     private static final int LINE_HEIGHT = 35;
     private static final int SPINNER_SIZE = 30;
 
-    public CustomTableRecyclerAdapter(Context context, List<String[]> tableHeadList, List<List<String[]>> tableList, boolean hideId, RecyclerView tablebody, String picture_base_path) {
+    public TableRecyclerAdapter(Context context, List<String[]> tableHeadList, List<List<String[]>> tableList, boolean hideId, RecyclerView tablebody, String picture_base_path) {
         this.tableList = tableList;
         this.context = context;
         this.hideId = hideId;
@@ -129,7 +129,7 @@ public class CustomTableRecyclerAdapter extends RecyclerView.Adapter<CustomTable
         void onItemClickListener(View v, int position, int itemViewType);
     }
 
-    private CustomTableRecyclerAdapter.OnMyItemClickListener myItemClickListener;
+    private TableRecyclerAdapter.OnMyItemClickListener myItemClickListener;
 
     public void setMyItemClickListener(OnMyItemClickListener myItemClickListener) {
         this.myItemClickListener = myItemClickListener;
@@ -394,15 +394,15 @@ public class CustomTableRecyclerAdapter extends RecyclerView.Adapter<CustomTable
         return linearLayout;
     }
 
-    public void setOnSpinnerClickListener(CustomTableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener) {
+    public void setOnSpinnerClickListener(TableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener) {
         this.onSpinnerClickListener = onSpinnerClickListener;
     }
 
-    public CustomTableRecyclerAdapter.OnSpinnerClickListener getOnSpinnerClickListener() {
+    public TableRecyclerAdapter.OnSpinnerClickListener getOnSpinnerClickListener() {
         return onSpinnerClickListener;
     }
 
-    private CustomTableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener;
+    private TableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener;
     
     public interface OnSpinnerClickListener {
         void onSpinner0Click(View v, LinearLayout root, EditText editText);
