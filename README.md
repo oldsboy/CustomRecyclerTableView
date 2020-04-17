@@ -1,4 +1,5 @@
-private void initTable2() {
+    使用说明：
+    private void initTable2() {
         final List<Student> data = Student.getList();
 
         List<String[]> headList = new ArrayList<>();                                  //  表头配置（String[]{字段名， 宽度， 是否需要下拉框配置（0，1）}
