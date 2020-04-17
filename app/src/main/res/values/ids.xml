@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="custom_table_item_text_view1" type="id" />
+    <item name="custom_table_item_edit_text1" type="id" />
+    <item name="custom_table_item_image_view1" type="id" />
+    <item name="custom_table_item_btn1" type="id" />
+
+</resources>
