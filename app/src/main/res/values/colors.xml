@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-
     <color name="default_color">#31404C</color>
     <color name="custom_table_grey">#FFE5E6E6</color>
     <color name="custom_table_list_gray_1">#FFF6F6F6</color>
