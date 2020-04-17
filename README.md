@@ -1,12 +1,14 @@
     使用说明：
-    private void initTable2() {
+
+
+    private void initTable3(View root) {
         final List<Student> data = Student.getList();
 
         List<String[]> headList = new ArrayList<>();                                  //  表头配置（String[]{字段名， 宽度， 是否需要下拉框配置（0，1）}
-        headList.add(new String[]{"Id", "80", CustomTableView.ItemEditType.textInput});
-        headList.add(new String[]{"名字","120", CustomTableView.ItemEditType.textInput});
-        headList.add(new String[]{"年龄","80", CustomTableView.ItemEditType.textInput});
-        CustomTableView.dataSetting<Student> dataSetting = new CustomTableView.dataSetting<Student>() {
+        headList.add(new String[]{"Id", "80", TableView.ItemEditType.textInput});
+        headList.add(new String[]{"名字","120", TableView.ItemEditType.textInput});
+        headList.add(new String[]{"年龄","80", TableView.ItemEditType.textInput});
+        TableView.dataSetting<Student> dataSetting = new TableView.dataSetting<Student>() {
             @Override
             public String[] parse(Student task) {
                 return new String[]{                                            //  配置列表显示数据②
@@ -22,7 +24,7 @@
             }
         };
 
-        CustomTableView.onToolBarClick onToolBarClick = new CustomTableView.onToolBarClick() {
+        TableView.onToolBarClick onToolBarClick = new TableView.onToolBarClick() {
             @Override
             public boolean clickDelete(String serverId) {
                 Student formList = Student.findFormList(data, serverId);
@@ -66,20 +68,20 @@
                 }
             }
         };
-        CustomTableView.OnBtnClickListener onBtnClickListener = new CustomTableView.OnBtnClickListener() {
+        TableView.OnBtnClickListener onBtnClickListener = new TableView.OnBtnClickListener() {
             @Override
-            public CustomTableRecyclerAdapter.OnImageViewClickListener onImageViewClickListener() {
+            public TableRecyclerAdapter.OnImageViewClickListener onImageViewClickListener() {
                 return null;
             }
 
             @Override
-            public CustomTableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener() {
+            public TableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener() {
                 return null;
             }
         };
 
-        CustomTableView customTableView = new CustomTableView<>(context, "测试用表", headList, onToolBarClick, dataSetting, onBtnClickListener);
-        customTableView.setScrollListView(true);
-        customTableView.setHideId(false);
-        customTableView.showTable((FrameLayout) findViewById(R.id.container));
+        TableView TableView = new TableView<>(context, "测试用表", headList, onToolBarClick, dataSetting, onBtnClickListener);
+        TableView.setScrollListView(true);
+        TableView.setHideId(false);
+        TableView.showTable((FrameLayout) root.findViewById(R.id.table3));
     }
