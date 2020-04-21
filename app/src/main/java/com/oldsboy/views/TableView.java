@@ -1,17 +1,25 @@
 package com.oldsboy.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.oldsboy.views.dialog.Dialog_BigTable;
+import com.oldsboy.views.utils.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +41,7 @@ import static com.oldsboy.views.utils.StringUtil.isEmpty;
 public class TableView<T> extends LinearLayout {
     public static final String TAG = "customTableView";
     private Context context;
+    private TableView tableView;
 
     /**
      * view
@@ -51,6 +60,7 @@ public class TableView<T> extends LinearLayout {
     private List<List<String[]>> table_list;
     private List<String> cellWidthPer;
     private String picture_base_path;
+    private boolean is_editing = false;
 
     private LinearLayoutManager linearLayoutManager;
 
@@ -59,27 +69,9 @@ public class TableView<T> extends LinearLayout {
      * **/
     private TableView.onToolBarClick onToolBarClick;
     private TableView.dataSetting<T> dataSetting;
+    private OnBtnClickListener onBtnClickListener;
 
-    public TableRecyclerAdapter tableRecyclerAdapter;
-
-    public void setScrollListView(boolean canScroll){
-        if (canScroll){
-            linearLayoutManager = new LinearLayoutManager(context){
-                @Override
-                public boolean canScrollVertically() {
-                    return true;
-                }
-            };
-        }else {
-            linearLayoutManager = new LinearLayoutManager(context){
-                @Override
-                public boolean canScrollVertically() {
-                    return false;
-                }
-            };
-        }
-        recycler_tablebody.setLayoutManager(linearLayoutManager);
-    }
+    private TableRecyclerAdapter tableRecyclerAdapter;
 
     public void setHideId(boolean hideId) {
         this.hideId = hideId;
@@ -95,6 +87,29 @@ public class TableView<T> extends LinearLayout {
 
     public void setPicture_base_path(String picture_base_path) {
         this.picture_base_path = picture_base_path;
+    }
+
+    public void setTableTitleCanEnter(boolean canEnter){
+        if (canEnter){
+            tv_table_name.setOnLongClickListener(new OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Dialog_BigTable dialog_bigTable = new Dialog_BigTable<>(context, table_name, tableHeadList, onToolBarClick, dataSetting, onBtnClickListener);
+                    dialog_bigTable.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            refreshTable();
+                        }
+                    });
+                    dialog_bigTable.show();
+                    return false;
+                }
+            });
+        }
+    }
+
+    public void refreshTable(){
+        initRecyclerView();
     }
 
     public @interface ItemEditType{
@@ -121,21 +136,43 @@ public class TableView<T> extends LinearLayout {
         this.picture_base_path = context.getCacheDir().getAbsolutePath();
         this.onBtnClickListener = onBtnClickListener;
 
-        ((LayoutInflater)this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_table_recycler_view, this);
+        ((LayoutInflater)this.context.getSystemService(context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_table_recycler_view, this);
         bindViews();
     }
 
-    public void showTable(FrameLayout root){
+    public void showTable(ViewGroup root){
         try {
             if (dataSetting == null) throw new Exception("需要设置数据绑定!setDataSetting");
             if (onToolBarClick == null) throw new Exception("需要设置toolbar的按键事件!setOnToolBarClick");
             createTableHead();
             initTable();
+            tableView = this;
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        root.addView(this);
+        refreshTableHeight();
+
+        if (root != null) {
+            root.removeAllViews();
+            root.addView(this);
+        }
+    }
+
+    private void refreshTableHeight() {
+        int head_height = ScreenUtil.px2dp(context, 30)
+                + ScreenUtil.px2dp(context, 30)
+                + ScreenUtil.px2dp(context, 25)
+                + tableRecyclerAdapter.getItemCount() * ScreenUtil.px2dp(context, TableRecyclerAdapter.LINE_HEIGHT)
+                + ScreenUtil.px2dp(context, 2);
+
+
+        ViewGroup.LayoutParams layoutParams = this.getLayoutParams();
+        if (layoutParams == null) {
+            layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0);
+        }
+        layoutParams.height = head_height;
+        this.setLayoutParams(layoutParams);
     }
 
     private void createTableHead() {
@@ -171,6 +208,11 @@ public class TableView<T> extends LinearLayout {
     private void initRecyclerView() {
         table_list = getTableList(dataSetting.getDataList());
 
+        tableRecyclerAdapter = new TableRecyclerAdapter(context, tableHeadList, table_list, hideId, recycler_tablebody, picture_base_path);
+        if (onBtnClickListener != null) {
+            tableRecyclerAdapter.setOnSpinnerClickListener(onBtnClickListener.onSpinnerClickListener());
+            tableRecyclerAdapter.setOnImageViewClickListener(onBtnClickListener.onImageViewClickListener());
+        }
         if (this.linearLayoutManager == null) {
             linearLayoutManager = new LinearLayoutManager(context) {
                 @Override
@@ -178,11 +220,6 @@ public class TableView<T> extends LinearLayout {
                     return false;
                 }
             };
-        }
-        tableRecyclerAdapter = new TableRecyclerAdapter(context, tableHeadList, table_list, hideId, recycler_tablebody, picture_base_path);
-        if (onBtnClickListener != null) {
-            tableRecyclerAdapter.setOnSpinnerClickListener(onBtnClickListener.onSpinnerClickListener());
-            tableRecyclerAdapter.setOnImageViewClickListener(onBtnClickListener.onImageViewClickListener());
         }
         recycler_tablebody.setLayoutManager(linearLayoutManager);
         recycler_tablebody.setAdapter(tableRecyclerAdapter);
@@ -196,6 +233,8 @@ public class TableView<T> extends LinearLayout {
             public void onClick(View v) {
                 int id = v.getId();
                 if (id == R.id.btn_add) {
+                    is_editing = true;
+
                     List<String[]> list = new ArrayList<>();
                     for (int i = 0; i < tableHeadList.size(); i++) {
                         String[] gezi = tableHeadList.get(i);
@@ -204,8 +243,11 @@ public class TableView<T> extends LinearLayout {
                     table_list.add(list);
                     tableRecyclerAdapter.notifyItemInserted(table_list.size());
 
+                    refreshTableHeight();
 //                            onToolBarClick.clickAdd();
                 } else if (id == R.id.btn_edit) {
+                    is_editing = true;
+
                     if (tableRecyclerAdapter.getLast_click_item() != -1) {
                         //  获取那条item数据重新设置，刷新表格
                         if (tableRecyclerAdapter.getItemViewType(tableRecyclerAdapter.getLast_click_item()) == TableRecyclerAdapter.SHOW_TYPE) {
@@ -222,13 +264,19 @@ public class TableView<T> extends LinearLayout {
                         Toast.makeText(context, "请选择一条item进行编辑!", Toast.LENGTH_SHORT).show();
                     }
                 } else if (id == R.id.btn_delete) {
+                    if (is_editing){
+                        Toast.makeText(context, "请保存以后再删除！", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     if (tableRecyclerAdapter.getLast_click_item() != -1) {
 //                                获取那条item数据重新设置，刷新表格
                         String serverId = tableRecyclerAdapter.getItem(tableRecyclerAdapter.getLast_click_item()).get(0)[0].replaceFirst(TableRecyclerAdapter.sufferString, "");
-                        tableRecyclerAdapter.removeItem(tableRecyclerAdapter.getLast_click_item());
                         if (onToolBarClick.clickDelete(serverId)) {
-                            Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
+                            tableRecyclerAdapter.removeItem(tableRecyclerAdapter.getLast_click_item());
                             tableRecyclerAdapter.setLast_click_item(-1);
+                            refreshTableHeight();
                         } else {
                             Toast.makeText(context, "删除失败", Toast.LENGTH_SHORT).show();
                             Log.e(TAG, "删除失败！serverId是：" + serverId);
@@ -237,21 +285,19 @@ public class TableView<T> extends LinearLayout {
                         Toast.makeText(context, "请选择一条item进行删除!", Toast.LENGTH_SHORT).show();
                     }
                 } else if (id == R.id.btn_save) {
+                    if (tableRecyclerAdapter.getLast_click_item() != -1)    tableRecyclerAdapter.notifyItemChanged(tableRecyclerAdapter.getLast_click_item());
                     tableRecyclerAdapter.setLast_click_item(-1);
                     List<ChangeBean> changeData = tableRecyclerAdapter.getChangeData();
                     onToolBarClick.clickSave(changeData);
 
+                    List<List<String[]>> newList = getTableList(dataSetting.getDataList());
                     for (ChangeBean changeDatum : changeData) {
                         int position = changeDatum.getPosition();
-                        table_list.clear();
-                        List<T> newData = dataSetting.getDataList();
-                        table_list.addAll(getTableList(newData));
+                        table_list.set(position, newList.get(position));
                         tableRecyclerAdapter.notifyItemChanged(position);
                     }
-//                        table_list.clear();
-//                        table_list.addAll(getTableList(dataSetting.getDataList()));
-//                        tableRecyclerAdapter.notifyDataSetChanged();
-//                        initRecyclerView();
+
+                    is_editing = false;
                 }
             }
         };
@@ -277,6 +323,7 @@ public class TableView<T> extends LinearLayout {
         return table_list;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void bindViews() {
         tv_table_name = findViewById(R.id.tv_table_name);
         btn_add = findViewById(R.id.btn_add);
@@ -285,9 +332,8 @@ public class TableView<T> extends LinearLayout {
         container_tablehead = findViewById(R.id.container_tablehead);
         recycler_tablebody = findViewById(R.id.container_tablebody);
         btn_save = findViewById(R.id.btn_save);
+        setTableTitleCanEnter(true);
     }
-
-    private OnBtnClickListener onBtnClickListener;
 
     public interface OnBtnClickListener {
         TableRecyclerAdapter.OnImageViewClickListener onImageViewClickListener();

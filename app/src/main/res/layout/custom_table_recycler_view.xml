@@ -7,24 +7,26 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:orientation="vertical">
         <!--表名-->
-        <TextView
-            android:id="@+id/tv_table_name"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="这里写表名"
-            android:textSize="14sp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:paddingLeft="18dp"
-            android:textColor="@color/default_color"
-            android:background="@drawable/custom_table_title"/>
+            android:layout_height="30dp"
+            android:background="@drawable/custom_table_title">
+            <TextView
+                android:id="@+id/tv_table_name"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:text="这里写表名"
+                android:textSize="14sp"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="35dp"
+                android:textColor="@color/default_color"/>
+        </FrameLayout>
         <!--工具栏-->
         <LinearLayout
-            android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:layout_height="30dp"
             android:gravity="center_vertical"
             android:background="@drawable/custom_table_list_2"
             android:orientation="horizontal">
@@ -152,24 +154,24 @@
             android:overScrollMode="never"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <!--表头-->
                 <LinearLayout
-                    android:id="@+id/container_tablehead"
-                    android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:orientation="horizontal"
-                    android:background="@color/custom_table_grey" />
-                <!--表体-->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/container_tablebody"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <!--表头-->
+                    <LinearLayout
+                        android:id="@+id/container_tablehead"
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:orientation="horizontal"
+                        android:background="@color/custom_table_grey" />
+                    <!--表体-->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/container_tablebody"
+                        android:overScrollMode="never"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
         </HorizontalScrollView>
     </LinearLayout>
 </LinearLayout>

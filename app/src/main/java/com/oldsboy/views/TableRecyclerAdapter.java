@@ -3,7 +3,6 @@ package com.oldsboy.views;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.oldsboy.views.dialog.Dialog_ShowPicture;
 import com.oldsboy.views.utils.BitmapsUtil;
 import com.oldsboy.views.utils.FileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.oldsboy.views.utils.ScreenUtil.px2dp;
 import static com.oldsboy.views.utils.StringUtil.isEmpty;
 
 /**
@@ -49,7 +50,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
     private int sufferStringLength = sufferString.length();
 
     private static final int TEXT_SIZE = 4;
-    private static final int LINE_HEIGHT = 35;
+    public static final int LINE_HEIGHT = 35;
     private static final int SPINNER_SIZE = 30;
 
     public TableRecyclerAdapter(Context context, List<String[]> tableHeadList, List<List<String[]>> tableList, boolean hideId, RecyclerView tablebody, String picture_base_path) {
@@ -143,11 +144,11 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
             @Override
             public void onClick(View v) {
                 int temp_position = last_click_item;
-                last_click_item = position;
-                if (temp_position != -1 && getItemViewType(temp_position) != EDIT_TYPE)    notifyItemChanged(temp_position);
-                if (last_click_item != -1 && getItemViewType(last_click_item) != EDIT_TYPE)    notifyItemChanged(last_click_item);
-                Log.d(TAG, "当前的current_position的位置是：" + last_click_item);
-
+                last_click_item = position;                                             //  刷新前后两个item的背景！
+                if (temp_position != -1 && getItemViewType(temp_position) != EDIT_TYPE)
+                    notifyItemChanged(temp_position);
+                if (last_click_item != -1 && getItemViewType(last_click_item) != EDIT_TYPE)
+                    notifyItemChanged(last_click_item);
                 if (myItemClickListener != null){
                     myItemClickListener.onItemClickListener(v, position, getItemViewType(temp_position));
                 }
@@ -175,7 +176,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
                 }
 //                int width = Integer.valueOf(mg[1]);                         //  列宽[1]
                 int itemType = Integer.valueOf(mg[2]);                   //  下拉[2]
-                Log.d(TAG, "开始编辑-->第" + position + "行第"+ lie +"列的数据：值是：" + value + "，itemType类型是：" + itemType);
+//                Log.d(TAG, "开始编辑-->第" + position + "行第"+ lie +"列的数据：值是：" + value + "，itemType类型是：" + itemType);
 
                 setText((EditText) holder.list.get(lie).findViewById(R.id.custom_table_item_edit_text1), value);
                 if (itemType == 1){
@@ -202,7 +203,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
                 }
 //                int width = Integer.valueOf(mg[1]);                         //  列宽[1]
                 int itemType = Integer.valueOf(mg[2]);                   //  下拉[2]
-                Log.d(TAG, "展示-->第" + position + "行第"+ lie +"列的数据：值是：" + value + "，itemType类型是：" + itemType);
+//                Log.d(TAG, "展示-->第" + position + "行第"+ lie +"列的数据：值是：" + value + "，itemType类型是：" + itemType);
 
                 setText((TextView)holder.list.get(lie).findViewById(R.id.custom_table_item_text_view1), value);
                 if (itemType == 2){
@@ -253,7 +254,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
      */
     public List<ChangeBean> getChangeData() {
         List<ChangeBean> changeData = new ArrayList<>();
-        for (int position = 0; position < tableList.size(); position++) {
+        for (int position = 0; position < tableList.size(); position++) {           //获取所有View为EditText的值来更新，TODO：问题：不在页面上的EditText则无法获得更新
             if (getItemViewType(position) == EDIT_TYPE && tablebody.getLayoutManager()!= null){
                 View view = tablebody.getLayoutManager().findViewByPosition(position);
                 if (view != null) {
@@ -543,6 +544,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+//                            DialogUtil.showBottomDialog(context, 100, 102);
                             if (onImageViewClickListener != null){
                                 onImageViewClickListener.onImageView0Click(v, root, imageView, editText);
                             }
@@ -562,6 +564,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
             }
         }
     }
+
     private static Button getNormalButton(Context context, int width){
         Button button = new Button(context);
         LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(width, px2dp(context, SPINNER_SIZE));
@@ -572,7 +575,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
         return button;
     }
 
-    private ImageView getNormalImageView(Context context, int width, String img_name){
+    private ImageView getNormalImageView(final Context context, int width, final String img_name){
         ImageView imgView = new ImageView(context);
         LinearLayout.LayoutParams tvPara = new LinearLayout.LayoutParams(px2dp(context, width), px2dp(context, LINE_HEIGHT-2));
         tvPara.gravity = Gravity.CENTER_VERTICAL;
@@ -584,7 +587,7 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
         return imgView;
     }
 
-    private void showPicture(ImageView imageView, String img_name){
+    private void showPicture(ImageView imageView, final String img_name){
         if (imageView != null) {
             if (this.base_picture_path != null && !this.base_picture_path.isEmpty()){
                 String file_path = this.base_picture_path + "/" + img_name;
@@ -592,6 +595,13 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
                     imageView.setImageBitmap(null);
                 }else if (FileUtil.isFileExists(file_path)){
                     imageView.setImageBitmap(BitmapsUtil.decodeFilePath(this.base_picture_path + "/" + img_name));
+                    imageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Dialog_ShowPicture dialog_showPicture = new Dialog_ShowPicture(context, base_picture_path + "/" + img_name);
+                            dialog_showPicture.show();
+                        }
+                    });
                 }else {
                     Log.e(TAG, "图片损坏！图片路径：" + file_path);
                     imageView.setImageResource(R.drawable.custom_picture_break);
@@ -627,10 +637,6 @@ public class TableRecyclerAdapter extends RecyclerView.Adapter<TableRecyclerAdap
         view.setVisibility(visible);
         view.setLayoutParams(vPara);
         return view;
-    }
-
-    private static int px2dp(Context context, int px) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, px,context.getResources().getDisplayMetrics());
     }
 
     private List<View> getAllChildViews(View view) {
