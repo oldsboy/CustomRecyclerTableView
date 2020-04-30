@@ -2,17 +2,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.oldsboy.views">
     <application>
-<!--        <activity-->
-<!--            android:name=".activity.Dialog_ShowPicture"-->
-<!--            android:theme="@style/Theme.AppCompat.Light.NoActionBar"-->
-<!--            android:configChanges="orientation"-->
-<!--            android:screenOrientation="landscape"-->
-<!--            android:launchMode="singleTop" />-->
-<!--        <activity-->
-<!--            android:name=".activity.Dialog_BigTable"-->
-<!--            android:theme="@style/Theme.AppCompat.Light.NoActionBar"-->
-<!--            android:configChanges="orientation"-->
-<!--            android:screenOrientation="landscape"-->
-<!--            android:launchMode="singleTop" />-->
     </application>
 </manifest>
