@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-package="com.oldsboy.views">
-    <application>
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.oldsboy.views">
+
+
+    <application
+        android:icon="@drawable/ic_launcher_background"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:allowBackup="false"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".run.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
