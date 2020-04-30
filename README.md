@@ -1,7 +1,10 @@
+    
+    引用依赖：
+    implementation 'com.github.oldsboy:CustomRecyclerTableView:acfb8c41ed'
+    
     使用说明：
-
-
-    private void initTable3(View root) {
+    
+    private void initTable1() {
         final List<Student> data = Student.getList();
 
         List<String[]> headList = new ArrayList<>();                                  //  表头配置（String[]{字段名， 宽度， 是否需要下拉框配置（0，1）}
@@ -24,7 +27,7 @@
             }
         };
 
-        TableView.onToolBarClick onToolBarClick = new TableView.onToolBarClick() {
+        TableView.onToolBarClick onToolBarClick = new TableView.onToolBarClick() {                          //  开放删除、保存点击事件
             @Override
             public boolean clickDelete(String serverId) {
                 Student formList = Student.findFormList(data, serverId);
@@ -36,7 +39,7 @@
             }
 
             @Override
-            public void clickSave(List<ChangeBean> save) {
+            public void clickSave(TableRecyclerAdapter tableRecyclerAdapter, List<ChangeBean> save) {
                 for (int i = 0; i < save.size(); i++) {
                     ChangeBean bean = save.get(i);
                     List<String> line = bean.getLine();
@@ -57,10 +60,8 @@
                             data.add(task);
                         } else {
                             Log.d("table", "更新的task属性为：");
-                            data.set(bean.getPosition()-1, task);
+                            data.set(bean.getPosition(), task);
                         }
-
-                        Log.d("table", StringUtil.printClassValue(task));
                     }catch (IndexOutOfBoundsException | NumberFormatException e){
                         e.printStackTrace();
                         Toast.makeText(context, "输入的数据类型不正确！", Toast.LENGTH_SHORT).show();
@@ -71,17 +72,76 @@
         TableView.OnBtnClickListener onBtnClickListener = new TableView.OnBtnClickListener() {
             @Override
             public TableRecyclerAdapter.OnImageViewClickListener onImageViewClickListener() {
-                return null;
+                return new TableRecyclerAdapter.OnImageViewClickListener() {            //  预设了2个选择图片的点击
+                    @Override
+                    public void onImageView0Click(View v, LinearLayout root, ImageView imgView, EditText editText) {
+
+                    }
+
+                    @Override
+                    public void onImageView1Click(View v, LinearLayout root, ImageView imgView, EditText editText) {
+
+                    }
+                };
             }
 
             @Override
             public TableRecyclerAdapter.OnSpinnerClickListener onSpinnerClickListener() {
-                return null;
+                return new TableRecyclerAdapter.OnSpinnerClickListener() {              //  预设了7个点击下拉框的点击
+                    @Override
+                    public void onSpinner0Click(View v, LinearLayout root, EditText editText) {
+
+                    }
+
+                    @Override
+                    public void onSpinner1Click(View v, LinearLayout root, EditText editText) {
+
+                    }
+
+                    @Override
+                    public void onSpinner2Click(View v, LinearLayout root, EditText editText) {
+
+                    }
+
+                    @Override
+                    public void onSpinner3Click(View v, LinearLayout root, EditText editText) {
+
+                    }
+
+                    @Override
+                    public void onSpinner4Click(View v, LinearLayout root, EditText editText) {
+
+                    }
+
+                    @Override
+                    public void onSpinner5Click(View v, LinearLayout root, EditText editText) {
+
+                    }
+
+                    @Override
+                    public void onSpinner6Click(View v, LinearLayout root, EditText editText) {
+
+                    }
+                };
             }
         };
 
-        TableView TableView = new TableView<>(context, "测试用表", headList, onToolBarClick, dataSetting, onBtnClickListener);
-        TableView.setScrollListView(true);
-        TableView.setHideId(false);
-        TableView.showTable((FrameLayout) root.findViewById(R.id.table3));
+        TableView tableView = new TableView<>(context, "测试用表", headList, onToolBarClick, dataSetting, onBtnClickListener);
+        //  true：   设置为recyclerView可以滑动模式
+        //  false：  设置为recyclerView不可滑动模式
+        tableView.setCanScrollVertical(true);
+        //  设置长按标题/点击扩展进入全屏表格模式
+        tableView.setTableTitleCanEnter(true);
+        //  显示标题
+        tableView.setTitleVisiablilty(View.VISIBLE);
+        //  显示工具栏
+        tableView.setTableToolbarVisiablilty(View.VISIBLE);
+        //  显示序号
+        tableView.setNeedOrder(true);
+        //  单击事件
+        tableView.setOnItemClicklistener(null);
+        //长按事件
+        tableView.setOnMyItemLongClickListener(null);
+        //  以上配置需要配置再showTable之前
+        tableView.showTable((FrameLayout) findViewById(R.id.table1));
     }
